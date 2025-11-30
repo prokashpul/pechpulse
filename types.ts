@@ -11,6 +11,7 @@ export interface User {
   role: UserRole;
   avatar?: string;
   bio?: string;
+  apiKey?: string; // User provided Gemini API Key
 }
 
 export interface BlogPost {

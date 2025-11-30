@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
-import { LayoutDashboard, FileText, Users, LogOut, Search, Home, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, LogOut, Search, Home, Menu, X, Settings } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
   const { user, logout, loading } = useAuth();
@@ -71,6 +71,7 @@ export const AdminLayout: React.FC = () => {
              <NavLink to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" />
              <NavLink to="/admin/posts" icon={FileText} label="Posts" />
              <NavLink to="/admin/users" icon={Users} label="User Roles" />
+             <NavLink to="/admin/settings" icon={Settings} label="Settings" />
            </div>
            
            <div className="pt-6 mt-6 border-t border-gray-100 dark:border-gray-800">

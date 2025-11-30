@@ -6,7 +6,7 @@ import { UserRole } from '../types';
 import { ThemeToggle } from './ThemeToggle';
 
 export const Sidebar: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, hasApiKey } = useAuth();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -43,12 +43,15 @@ export const Sidebar: React.FC = () => {
               <span className="font-medium">Categories</span>
             </Link>
           </li>
-          <li>
-            <Link to="/features" className={linkClass('/features')}>
-              <ImageIcon className="w-5 h-5" />
-              <span className="font-medium">AI Tools</span>
-            </Link>
-          </li>
+          
+          {hasApiKey && (
+            <li>
+              <Link to="/features" className={linkClass('/features')}>
+                <ImageIcon className="w-5 h-5" />
+                <span className="font-medium">AI Tools</span>
+              </Link>
+            </li>
+          )}
           
           {user?.role === UserRole.ADMIN && (
             <div className="pt-6 pb-2">

@@ -13,6 +13,7 @@ import { Dashboard } from './pages/admin/Dashboard';
 import { PostList } from './pages/admin/PostList';
 import { CreatePost } from './pages/admin/CreatePost';
 import { UserList } from './pages/admin/UserList';
+import { AdminSettings } from './pages/admin/Settings';
 import { Features } from './pages/Features';
 import { Categories } from './pages/Categories';
 import { Profile } from './pages/Profile';
@@ -61,6 +62,7 @@ const App: React.FC = () => {
               <Route path="posts/new" element={<CreatePost />} />
               <Route path="posts/edit/:id" element={<CreatePost />} />
               <Route path="users" element={<UserList />} />
+              <Route path="settings" element={<AdminSettings />} />
             </Route>
           </Routes>
         </Router>

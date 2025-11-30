@@ -1,22 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 
-// CAUTION: In a real production app, never expose keys on the client.
-// This is for demonstration purposes within a client-side only context.
-const getClient = () => {
-  const apiKey = process.env.API_KEY || ''; 
-  // Ideally this comes from env, but if it's missing in this specific sandbox 
-  // environment, we handle it gracefully or prompt the user. 
-  // For this code gen, we assume process.env.API_KEY is available.
+// Helper to get client with priority: User Key > Env Key
+const getClient = (userApiKey?: string) => {
+  const apiKey = userApiKey || process.env.API_KEY || ''; 
+  
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please add your Gemini API Key in Profile settings.");
+  }
   return new GoogleGenAI({ apiKey });
 };
 
 export const GeminiService = {
   // 1. Fast Generation
-  generateTitle: async (topic: string): Promise<string> => {
+  generateTitle: async (topic: string, apiKey?: string): Promise<string> => {
     try {
-      const ai = getClient();
+      const ai = getClient(apiKey);
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash', // Using 2.5 Flash for reliable low latency
+        model: 'gemini-2.5-flash', 
         contents: `Generate a catchy, SEO-friendly blog post title about: ${topic}. Return only the title text.`,
       });
       return response.text?.trim() || "Untitled Post";
@@ -27,9 +27,9 @@ export const GeminiService = {
   },
 
   // 2. Complex Generation with Search Grounding (Flash)
-  generateBlogPost: async (topic: string): Promise<{content: string, sources: string[]}> => {
+  generateBlogPost: async (topic: string, apiKey?: string): Promise<{content: string, sources: string[]}> => {
     try {
-      const ai = getClient();
+      const ai = getClient(apiKey);
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Write a comprehensive, engaging blog post about "${topic}". 
@@ -51,16 +51,14 @@ export const GeminiService = {
       return { content, sources };
     } catch (error) {
       console.error("Gemini Content Error:", error);
-      return { content: "<p>Failed to generate content. Please try again.</p>", sources: [] };
+      return { content: "<p>Failed to generate content. Please check your API Key or try again.</p>", sources: [] };
     }
   },
 
   // 3. Image Editing (Nano Banana - Gemini 2.5 Flash Image)
-  editImage: async (imageBase64: string, prompt: string): Promise<string | null> => {
+  editImage: async (imageBase64: string, prompt: string, apiKey?: string): Promise<string | null> => {
     try {
-      const ai = getClient();
-      // Important: Ensure base64 string doesn't have the data URL prefix for the payload if the SDK handles it, 
-      // but usually standard is raw base64. The SDK helper might want raw.
+      const ai = getClient(apiKey);
       const cleanBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
       
       const response = await ai.models.generateContent({
@@ -69,7 +67,7 @@ export const GeminiService = {
           parts: [
             {
               inlineData: {
-                mimeType: 'image/png', // Assuming PNG or converting logic elsewhere
+                mimeType: 'image/png', 
                 data: cleanBase64
               }
             },
@@ -80,7 +78,6 @@ export const GeminiService = {
         }
       });
 
-      // Iterate to find image part
       if (response.candidates?.[0]?.content?.parts) {
         for (const part of response.candidates[0].content.parts) {
           if (part.inlineData && part.inlineData.data) {
@@ -95,10 +92,10 @@ export const GeminiService = {
     }
   },
 
-  // 4. Image Generation (using Gemini 2.5 Flash Image for generation)
-  generateThumbnail: async (prompt: string): Promise<string | null> => {
+  // 4. Image Generation
+  generateThumbnail: async (prompt: string, apiKey?: string): Promise<string | null> => {
     try {
-      const ai = getClient();
+      const ai = getClient(apiKey);
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {

@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, Zap, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Zap, AlertCircle, Key } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
+    if (login(email, password, apiKey)) {
       // Check if admin to redirect to dashboard
       if (email === 'prokashpul2@gmail.com') {
          navigate('/admin/dashboard');
@@ -115,6 +116,24 @@ export const Login: React.FC = () => {
                         required 
                       />
                    </div>
+                </div>
+
+                <div>
+                   <label className="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
+                     <span>Gemini API Key</span>
+                     <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Optional</span>
+                   </label>
+                   <div className="relative group">
+                      <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 transition group-focus-within:text-indigo-600" />
+                      <input 
+                        type="password" 
+                        value={apiKey}
+                        onChange={e => setApiKey(e.target.value)}
+                        placeholder="AI Studio API Key (enable AI features)"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-gray-50 focus:bg-white"
+                      />
+                   </div>
+                   <p className="text-xs text-gray-500 mt-1">Leave empty if you don't have one yet. AI features will remain hidden.</p>
                 </div>
 
                 <div className="flex items-center">

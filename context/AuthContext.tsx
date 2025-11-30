@@ -4,10 +4,11 @@ import { MockBackend } from '../services/mockData';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, pass: string) => boolean;
+  login: (email: string, pass: string, apiKey?: string) => boolean;
   loginWithGoogle: () => void;
   logout: () => void;
   updateProfile: (user: User) => void;
+  hasApiKey: boolean;
   loading: boolean;
 }
 
@@ -26,8 +27,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = (email: string, pass: string): boolean => {
-    const authUser = MockBackend.login(email, pass);
+  const login = (email: string, pass: string, apiKey?: string): boolean => {
+    const authUser = MockBackend.login(email, pass, apiKey);
     if (authUser) {
       setUser(authUser);
       localStorage.setItem('techpulse_current_user', JSON.stringify(authUser));
@@ -53,8 +54,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('techpulse_current_user', JSON.stringify(updatedUser));
   };
 
+  // Utility to check if API key exists (prefer user key, then env)
+  const hasApiKey = !!(user?.apiKey || process.env.API_KEY);
+
   return (
-    <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, updateProfile, loading }}>
+    <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, updateProfile, hasApiKey, loading }}>
       {children}
     </AuthContext.Provider>
   );

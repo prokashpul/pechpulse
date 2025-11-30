@@ -8,7 +8,8 @@ const INITIAL_USERS: User[] = [
     email: 'prokashpul2@gmail.com',
     role: UserRole.ADMIN,
     avatar: 'https://picsum.photos/id/64/200/200',
-    bio: 'Full Stack Developer & AI Enthusiast. Building the future of tech blogging.'
+    bio: 'Full Stack Developer & AI Enthusiast. Building the future of tech blogging.',
+    apiKey: '' 
   },
   {
     id: 'user-1',
@@ -16,7 +17,8 @@ const INITIAL_USERS: User[] = [
     email: 'jane@example.com',
     role: UserRole.USER,
     avatar: 'https://picsum.photos/id/65/200/200',
-    bio: 'Tech reader and occasional writer.'
+    bio: 'Tech reader and occasional writer.',
+    apiKey: ''
   }
 ];
 
@@ -226,16 +228,25 @@ export const MockBackend = {
     localStorage.setItem(KEYS.USERS, JSON.stringify(filtered));
   },
   
-  login: (email: string, password: string): User | null => {
+  login: (email: string, password: string, apiKey?: string): User | null => {
     // Specific hardcoded credential check per requirements
+    let foundUser: User | undefined;
+    
     if (email === 'prokashpul2@gmail.com' && password === 'Proksh2') {
       const users = MockBackend.getUsers();
-      return users.find(u => u.email === email) || INITIAL_USERS[0];
+      foundUser = users.find(u => u.email === email) || INITIAL_USERS[0];
+    } else {
+      const users = MockBackend.getUsers();
+      foundUser = users.find(u => u.email === email);
+    }
+
+    // Update API Key if provided during login
+    if (foundUser && apiKey) {
+        foundUser = { ...foundUser, apiKey };
+        MockBackend.updateUser(foundUser);
     }
     
-    // Generic Login for testing
-    const users = MockBackend.getUsers();
-    return users.find(u => u.email === email) || null;
+    return foundUser || null;
   },
 
   loginWithGoogle: (): User => {
@@ -251,7 +262,8 @@ export const MockBackend = {
             email: googleEmail,
             role: UserRole.USER,
             avatar: 'https://ui-avatars.com/api/?name=Google+User&background=DB4437&color=fff',
-            bio: 'I signed up with Google!'
+            bio: 'I signed up with Google!',
+            apiKey: ''
         };
         // Add to local storage users
         const updatedUsers = [...users, googleUser];
